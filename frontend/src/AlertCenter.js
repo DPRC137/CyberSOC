@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import API_BASE_URL from "./apiConfig";
+import { API_BASE } from "./apiConfig";
 
 export default function AlertCenter() {
   const [alertsData, setAlertsData] = useState(null);
@@ -9,7 +9,7 @@ export default function AlertCenter() {
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/alerts`);
+        const res = await fetch(`${API_BASE}/api/alerts`);
         const data = await res.json();
         setAlertsData(data);
         setLoading(false);
@@ -41,14 +41,14 @@ export default function AlertCenter() {
 
   const handleAction = async (id, action) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/alerts/${id}/status`, {
+      const res = await fetch(`${API_BASE}/api/alerts/${id}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: action })
       });
       const result = await res.json();
       if (result.success) {
-        // Update local state to reflect change immediately without needing a full refresh
+        // Update local state to reflect change immediately
         setAlertsData(prev => ({
           ...prev,
           alerts: prev.alerts.map(a => a.id === id ? { ...a, status: action } : a)
@@ -67,7 +67,7 @@ export default function AlertCenter() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Alert Center</h1>
-          <div className="page-subtitle">Manage and investigate system-generated security alerts</div>
+          <div className="page-subtitle">Manage and investigate Bayesian-Markov hybrid security alerts</div>
         </div>
       </div>
 
@@ -127,49 +127,75 @@ export default function AlertCenter() {
                 <th>Source IP</th>
                 <th>Target Device</th>
                 <th>Attack Type</th>
+                <th>Risk Metrics</th>
                 <th>Description</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredAlerts.map(alert => (
-                <tr key={alert.id} style={{ 
-                  backgroundColor: alert.severity === 'critical' ? 'rgba(239, 68, 68, 0.05)' : 'transparent',
-                  borderLeft: `2px solid var(--severity-${alert.severity})`
-                }}>
-                  <td style={{ whiteSpace: "nowrap" }}>{alert.timestamp.split('T')[1].replace('Z','')}</td>
-                  <td>
-                    <span className={`topbar-badge badge-${alert.severity} ${alert.severity === 'critical' ? 'glitch-text' : ''}`} style={{ display: "inline-block", padding: "2px 8px", fontSize: "0.7rem" }}>
-                      {alert.severity}
-                    </span>
-                  </td>
-                  <td style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", color: "var(--text-muted)" }}>{alert.id}</td>
-                  <td style={{ fontFamily: "var(--font-mono)", color: "var(--accent-cyan)" }}>{alert.sourceIP}</td>
-                  <td>{alert.device}</td>
-                  <td style={{ fontWeight: "500", color: "var(--text-primary)" }}>{alert.attackType}</td>
-                  <td style={{ fontSize: "0.8rem", maxWidth: "250px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={alert.description}>
-                    {alert.description}
-                  </td>
-                  <td>
-                    <span style={{ 
-                      padding: "2px 6px", 
-                      borderRadius: "4px", 
-                      fontSize: "0.75rem",
-                      background: alert.status === 'new' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(255,255,255,0.1)',
-                      color: alert.status === 'new' ? 'var(--accent-blue)' : 'var(--text-secondary)'
-                    }}>
-                      {alert.status}
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <button className="btn btn-outline" style={{ padding: "2px 8px", fontSize: "0.7rem" }} onClick={() => handleAction(alert.id, 'investigating')}>Investigate</button>
-                      <button className="btn btn-outline" style={{ padding: "2px 8px", fontSize: "0.7rem", borderColor: "rgba(34, 197, 94, 0.3)", color: "var(--severity-low)" }} onClick={() => handleAction(alert.id, 'resolved')}>Resolve</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {filteredAlerts.map(alert => {
+                const sIp = alert.source_ip || alert.sourceIP || "0.0.0.0";
+                const atk = alert.attack_type || alert.attackType || "Anomaly";
+                const hybridRisk = alert.hybrid_risk != null ? (alert.hybrid_risk * 100).toFixed(0) + "%" : null;
+                const bayesProb = alert.bayesian_prob != null ? (alert.bayesian_prob * 100).toFixed(0) + "%" : null;
+
+                return (
+                  <tr key={alert.id} style={{ 
+                    backgroundColor: alert.severity === 'critical' ? 'rgba(239, 68, 68, 0.05)' : 'transparent',
+                    borderLeft: `2px solid var(--severity-${alert.severity})`
+                  }}>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      {alert.timestamp ? (alert.timestamp.includes('T') ? alert.timestamp.split('T')[1].replace('Z','') : alert.timestamp) : "--:--:--"}
+                    </td>
+                    <td>
+                      <span className={`topbar-badge badge-${alert.severity} ${alert.severity === 'critical' ? 'glitch-text' : ''}`} style={{ display: "inline-block", padding: "2px 8px", fontSize: "0.7rem" }}>
+                        {alert.severity}
+                      </span>
+                    </td>
+                    <td style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", color: "var(--text-muted)" }}>{alert.id}</td>
+                    <td style={{ fontFamily: "var(--font-mono)", color: "var(--accent-cyan)" }}>{sIp}</td>
+                    <td>{alert.device}</td>
+                    <td style={{ fontWeight: "500", color: "var(--text-primary)" }}>{atk}</td>
+                    <td>
+                      {hybridRisk ? (
+                        <div style={{ display: "flex", gap: "4px", fontSize: "0.72rem" }}>
+                          <span style={{ color: "var(--accent-cyan)", background: "rgba(34,211,238,0.1)", padding: "1px 5px", borderRadius: "3px" }} title="Hybrid Risk">
+                            ⚡ {hybridRisk}
+                          </span>
+                          {bayesProb && (
+                            <span style={{ color: "var(--accent-purple)", background: "rgba(167,139,250,0.1)", padding: "1px 5px", borderRadius: "3px" }} title="Bayesian Probability">
+                              P(B): {bayesProb}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>—</span>
+                      )}
+                    </td>
+                    <td style={{ fontSize: "0.8rem", maxWidth: "250px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={alert.description}>
+                      {alert.description}
+                    </td>
+                    <td>
+                      <span style={{ 
+                        padding: "2px 6px", 
+                        borderRadius: "4px", 
+                        fontSize: "0.75rem",
+                        background: alert.status === 'new' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(255,255,255,0.1)',
+                        color: alert.status === 'new' ? 'var(--accent-blue)' : 'var(--text-secondary)'
+                      }}>
+                        {alert.status}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <button className="btn btn-outline" style={{ padding: "2px 8px", fontSize: "0.7rem" }} onClick={() => handleAction(alert.id, 'investigating')}>Investigate</button>
+                        <button className="btn btn-outline" style={{ padding: "2px 8px", fontSize: "0.7rem", borderColor: "rgba(34, 197, 94, 0.3)", color: "var(--severity-low)" }} onClick={() => handleAction(alert.id, 'resolved')}>Resolve</button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
           

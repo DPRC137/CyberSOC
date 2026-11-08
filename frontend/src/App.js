@@ -10,6 +10,7 @@ import DeviceManager from "./DeviceManager";
 import AlertCenter from "./AlertCenter";
 import Upload from "./Upload";
 import Dashboard from "./Dashboard";
+import HybridAnalytics from "./HybridAnalytics";
 
 function Sidebar() {
   return (
@@ -21,6 +22,9 @@ function Sidebar() {
       <nav className="sidebar-nav">
         <NavLink to="/" className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")} end>
           <span className="nav-icon">📊</span> SOC Overview
+        </NavLink>
+        <NavLink to="/hybrid" className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}>
+          <span className="nav-icon">🧠</span> Hybrid Engine
         </NavLink>
         <NavLink to="/threats" className={({ isActive }) => (isActive ? "nav-item active" : "nav-item")}>
           <span className="nav-icon">🌍</span> Threat Intel
@@ -51,6 +55,7 @@ function Topbar() {
   const getPageTitle = () => {
     switch (location.pathname) {
       case "/": return "SOC Command Center";
+      case "/hybrid": return "Bayesian-Markov Hybrid Threat Engine";
       case "/threats": return "Global Threat Intelligence";
       case "/devices": return "IoT Device Management";
       case "/alerts": return "Security Alerts Log";
@@ -96,6 +101,7 @@ function MainApp() {
           <div className="page-container">
             <Routes>
               <Route path="/" element={<SOCOverview />} />
+              <Route path="/hybrid" element={<HybridAnalytics />} />
               <Route path="/threats" element={<ThreatIntel />} />
               <Route path="/devices" element={<DeviceManager />} />
               <Route path="/alerts" element={<AlertCenter />} />

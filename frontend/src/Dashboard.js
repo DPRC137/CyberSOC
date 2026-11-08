@@ -47,6 +47,7 @@ export default function Dashboard({ data, onReset }) {
     unusualTimeCount = 0, protocolChart = [], browserChart = [], encryptionChart = [],
     attackByProtocol = [], attackByBrowser = [], failedLoginChart = [],
     packetChart = [], ipStats = {}, sessionStats = {}, riskChart = [], trendData = [], topRisky = [],
+    modelMetrics = null,
   } = data || {};
 
   // Sort risk chart in logical order
@@ -106,6 +107,88 @@ export default function Dashboard({ data, onReset }) {
           <div className="stat-sub">Max: {sessionStats.max}s</div>
         </div>
       </div>
+
+      {/* ===== MATHEMATICAL MODEL EVALUATION METRICS ===== */}
+      {modelMetrics && modelMetrics.accuracy != null && (
+        <div className="chart-card full-width delay-2" style={{ marginBottom: "var(--space-xl)", borderColor: "rgba(34, 211, 238, 0.3)" }}>
+          <div className="chart-header">
+            <div>
+              <div className="chart-title" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span>🧠</span> Bayesian-Markov Model Performance Metrics
+              </div>
+              <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "4px" }}>
+                Rigorous mathematical evaluation validated against {modelMetrics.total_samples || rows} dataset instances
+              </div>
+            </div>
+            <span className="chart-badge" style={{ background: "rgba(34, 211, 238, 0.15)", color: "var(--accent-cyan)", border: "1px solid var(--accent-cyan)" }}>
+              Mathematical Validation
+            </span>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "var(--space-md)", margin: "var(--space-md) 0" }}>
+            <div style={{ background: "rgba(255,255,255,0.03)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)", textAlign: "center" }}>
+              <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Accuracy</div>
+              <div style={{ fontSize: "1.4rem", fontWeight: "700", color: "var(--accent-cyan)", marginTop: "4px" }}>
+                {(modelMetrics.accuracy * 100).toFixed(2)}%
+              </div>
+            </div>
+
+            <div style={{ background: "rgba(255,255,255,0.03)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)", textAlign: "center" }}>
+              <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Precision</div>
+              <div style={{ fontSize: "1.4rem", fontWeight: "700", color: "var(--accent-blue)", marginTop: "4px" }}>
+                {(modelMetrics.precision * 100).toFixed(2)}%
+              </div>
+            </div>
+
+            <div style={{ background: "rgba(255,255,255,0.03)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)", textAlign: "center" }}>
+              <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Recall</div>
+              <div style={{ fontSize: "1.4rem", fontWeight: "700", color: "var(--accent-purple)", marginTop: "4px" }}>
+                {(modelMetrics.recall * 100).toFixed(2)}%
+              </div>
+            </div>
+
+            <div style={{ background: "rgba(255,255,255,0.03)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)", textAlign: "center" }}>
+              <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>F1-Score</div>
+              <div style={{ fontSize: "1.4rem", fontWeight: "700", color: "var(--severity-low)", marginTop: "4px" }}>
+                {(modelMetrics.f1_score * 100).toFixed(2)}%
+              </div>
+            </div>
+
+            <div style={{ background: "rgba(255,255,255,0.03)", padding: "12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.05)", textAlign: "center" }}>
+              <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "uppercase" }}>ROC-AUC</div>
+              <div style={{ fontSize: "1.4rem", fontWeight: "700", color: "var(--accent-pink)", marginTop: "4px" }}>
+                {(modelMetrics.roc_auc * 100).toFixed(2)}%
+              </div>
+            </div>
+          </div>
+
+          {modelMetrics.confusion_matrix && (
+            <div style={{ marginTop: "var(--space-md)", background: "rgba(0,0,0,0.2)", padding: "16px", borderRadius: "8px" }}>
+              <div style={{ fontSize: "0.85rem", fontWeight: "600", marginBottom: "10px", color: "var(--text-secondary)" }}>
+                Confusion Matrix (Bayesian Posteriors vs Ground Truth)
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", maxWidth: "420px", margin: "0 auto", textAlign: "center" }}>
+                <div style={{ background: "rgba(34, 197, 94, 0.1)", border: "1px solid rgba(34, 197, 94, 0.3)", padding: "10px", borderRadius: "6px" }}>
+                  <div style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>True Negatives (TN)</div>
+                  <div style={{ fontSize: "1.2rem", fontWeight: "700", color: "var(--severity-low)" }}>{modelMetrics.confusion_matrix.tn}</div>
+                </div>
+                <div style={{ background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)", padding: "10px", borderRadius: "6px" }}>
+                  <div style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>False Positives (FP)</div>
+                  <div style={{ fontSize: "1.2rem", fontWeight: "700", color: "var(--severity-critical)" }}>{modelMetrics.confusion_matrix.fp}</div>
+                </div>
+                <div style={{ background: "rgba(234, 179, 8, 0.1)", border: "1px solid rgba(234, 179, 8, 0.3)", padding: "10px", borderRadius: "6px" }}>
+                  <div style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>False Negatives (FN)</div>
+                  <div style={{ fontSize: "1.2rem", fontWeight: "700", color: "var(--severity-medium)" }}>{modelMetrics.confusion_matrix.fn}</div>
+                </div>
+                <div style={{ background: "rgba(34, 211, 238, 0.1)", border: "1px solid rgba(34, 211, 238, 0.3)", padding: "10px", borderRadius: "6px" }}>
+                  <div style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>True Positives (TP)</div>
+                  <div style={{ fontSize: "1.2rem", fontWeight: "700", color: "var(--accent-cyan)" }}>{modelMetrics.confusion_matrix.tp}</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ===== DATA COLUMNS ===== */}
       <div className="chart-card delay-3" style={{ marginBottom: "var(--space-xl)" }}>
@@ -181,8 +264,8 @@ export default function Dashboard({ data, onReset }) {
                 paddingAngle={4}
                 strokeWidth={0}
               >
-                {protocolChart.map((_, i) => (
-                  <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                {protocolChart.map((entry, index) => (
+                  <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
@@ -207,8 +290,8 @@ export default function Dashboard({ data, onReset }) {
                 paddingAngle={4}
                 strokeWidth={0}
               >
-                {browserChart.map((_, i) => (
-                  <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                {browserChart.map((entry, index) => (
+                  <Cell key={index} fill={PIE_COLORS[(index + 2) % PIE_COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
@@ -216,87 +299,33 @@ export default function Dashboard({ data, onReset }) {
           </ResponsiveContainer>
         </div>
 
-        {/* Encryption Bar */}
-        <div className="chart-card delay-6">
+        {/* Packet Size Histogram */}
+        <div className="chart-card delay-5">
           <div className="chart-header">
-            <div className="chart-title">🔒 Encryption Usage</div>
-            <span className="chart-badge">Bar</span>
-          </div>
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={encryptionChart} barSize={50}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="value" name="Sessions" radius={[8, 8, 0, 0]}>
-                {encryptionChart.map((_, i) => (
-                  <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Packet Size Distribution */}
-        <div className="chart-card delay-7">
-          <div className="chart-header">
-            <div className="chart-title">📦 Packet Size Distribution</div>
+            <div className="chart-title">Packet Size Distribution</div>
             <span className="chart-badge">Histogram</span>
           </div>
           <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={packetChart} barSize={40}>
+            <BarChart data={packetChart} barSize={36}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="range" />
               <YAxis />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="count" name="Packets" fill={COLORS.purple} radius={[8, 8, 0, 0]}>
-                {packetChart.map((_, i) => (
-                  <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                ))}
-              </Bar>
+              <Bar dataKey="count" name="Packets" fill={COLORS.cyan} radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
 
-      {/* ===== SECTION: Attack Analysis ===== */}
-      <div className="section-heading delay-6">
-        <h2>🎯 Attack Correlation</h2>
-        <div className="section-line"></div>
-      </div>
-
-      <div className="charts-grid">
         {/* Attack Rate by Protocol */}
         <div className="chart-card delay-6">
           <div className="chart-header">
-            <div className="chart-title">Attack Rate by Protocol</div>
-            <span className="chart-badge">%</span>
+            <div className="chart-title">Attack Rate by Protocol (%)</div>
+            <span className="chart-badge">Radar</span>
           </div>
           <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={attackByProtocol} barSize={50}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis unit="%" />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="rate" name="Attack Rate" unit="%" radius={[8, 8, 0, 0]}>
-                {attackByProtocol.map((entry, i) => (
-                  <Cell key={i} fill={entry.rate > 50 ? COLORS.red : entry.rate > 40 ? COLORS.amber : COLORS.green} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Attack Rate by Browser */}
-        <div className="chart-card delay-7">
-          <div className="chart-header">
-            <div className="chart-title">Attack Rate by Browser</div>
-            <span className="chart-badge">%</span>
-          </div>
-          <ResponsiveContainer width="100%" height={280}>
-            <RadarChart data={attackByBrowser} outerRadius={90}>
-              <PolarGrid stroke="rgba(255,255,255,0.06)" />
-              <PolarAngleAxis dataKey="name" />
+            <RadarChart cx="50%" cy="50%" outerRadius={90} data={attackByProtocol}>
+              <PolarGrid stroke="#334155" />
+              <PolarAngleAxis dataKey="name" stroke="#94a3b8" />
               <PolarRadiusAxis angle={30} domain={[0, 100]} />
               <Radar name="Attack Rate" dataKey="rate" stroke={COLORS.pink} fill={COLORS.pink} fillOpacity={0.2} strokeWidth={2} />
               <Tooltip content={<CustomTooltip />} />
@@ -325,10 +354,10 @@ export default function Dashboard({ data, onReset }) {
           </ResponsiveContainer>
         </div>
 
-        {/* Risk Levels */}
+        {/* Risk Levels (Hybrid Calibrated) */}
         <div className="chart-card delay-8">
           <div className="chart-header">
-            <div className="chart-title">⚠️ Risk Level Breakdown</div>
+            <div className="chart-title">⚠️ Hybrid Risk Level Breakdown</div>
             <span className="chart-badge">Pie</span>
           </div>
           <ResponsiveContainer width="100%" height={280}>

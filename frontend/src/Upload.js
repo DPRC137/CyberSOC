@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import axios from "axios";
-import API_BASE_URL from "./apiConfig";
+import { API_BASE } from "./apiConfig";
 
 export default function Upload({ onData, loading, setLoading }) {
   const [file, setFile] = useState(null);
@@ -35,7 +35,7 @@ export default function Upload({ onData, loading, setLoading }) {
     const formData = new FormData();
     formData.append("file", file);
     try {
-      const res = await axios.post(`${API_BASE_URL}/upload`, formData);
+      const res = await axios.post(`${API_BASE}/upload`, formData);
       if (res.data.error) {
         alert("Server error: " + res.data.error);
       } else {
@@ -43,7 +43,7 @@ export default function Upload({ onData, loading, setLoading }) {
       }
     } catch (err) {
       console.error("Upload error:", err);
-      alert("Failed to upload. Please ensure the backend server is reachable.");
+      alert("Failed to upload. Make sure the Flask server is running on port 5000.");
     } finally {
       setLoading(false);
     }

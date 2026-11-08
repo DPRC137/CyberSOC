@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import CountUp from "react-countup";
-import { AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import API_BASE_URL from "./apiConfig";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { API_BASE } from "./apiConfig";
 
 const COLORS = {
   critical: "#ef4444",
@@ -36,9 +36,9 @@ export default function SOCOverview() {
     const fetchData = async () => {
       try {
         const [dashRes, feedRes, anomRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/dashboard/live`),
-          fetch(`${API_BASE_URL}/api/threats/feed`),
-          fetch(`${API_BASE_URL}/api/ai/anomalies`)
+          fetch(`${API_BASE}/api/dashboard/live`),
+          fetch(`${API_BASE}/api/threats/feed`),
+          fetch(`${API_BASE}/api/ai/anomalies`)
         ]);
         
         const dashData = await dashRes.json();
