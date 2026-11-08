@@ -19,7 +19,7 @@ frontend/package-lock.json
 # Build outputs
 build/
 dist/
-frontend/build/
+!frontend/build/
 .vercel/
 
 # Python cache & virtual environments

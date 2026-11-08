@@ -44,8 +44,8 @@ function renderPieLabel({ name, percent }) {
 export default function Dashboard({ data, onReset }) {
   const {
     rows = 0, columns = [], attackCount = 0, normalCount = 0, attackRate = 0,
-    unusualTimeCount = 0, protocolChart = [], browserChart = [], encryptionChart = [],
-    attackByProtocol = [], attackByBrowser = [], failedLoginChart = [],
+    unusualTimeCount = 0, protocolChart = [], browserChart = [],
+    attackByProtocol = [], failedLoginChart = [],
     packetChart = [], ipStats = {}, sessionStats = {}, riskChart = [], trendData = [], topRisky = [],
     modelMetrics = null,
   } = data || {};

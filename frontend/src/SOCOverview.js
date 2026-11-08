@@ -66,12 +66,6 @@ export default function SOCOverview() {
     );
   }
 
-  const riskData = [
-    { name: 'Critical', value: liveData.topIPs.filter(ip => ip.severity === 'critical').length || 1 },
-    { name: 'High', value: liveData.topIPs.filter(ip => ip.severity === 'high').length || 2 },
-    { name: 'Medium', value: liveData.topIPs.filter(ip => ip.severity === 'medium').length || 3 },
-    { name: 'Low', value: liveData.topIPs.filter(ip => ip.severity === 'low').length || 4 },
-  ];
 
   return (
     <div className="animate-fade-in">
