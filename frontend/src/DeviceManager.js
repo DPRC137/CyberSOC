@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import API_BASE_URL from "./apiConfig";
+import { API_BASE } from "./apiConfig";
 
 const COLORS = ["#3b82f6", "#8b5cf6", "#ec4899", "#22d3ee", "#34d399", "#fbbf24"];
 
@@ -24,7 +24,7 @@ export default function DeviceManager() {
   useEffect(() => {
     const fetchDevices = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/devices`);
+        const res = await fetch(`${API_BASE}/api/devices`);
         const data = await res.json();
         setDeviceData(data);
         setLoading(false);

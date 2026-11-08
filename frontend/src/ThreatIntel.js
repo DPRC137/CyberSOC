@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import API_BASE_URL from "./apiConfig";
+import { API_BASE } from "./apiConfig";
 
 const COLORS = {
   critical: "#ef4444",
@@ -30,7 +30,7 @@ export default function ThreatIntel() {
   useEffect(() => {
     const fetchGeo = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/geo/threats`);
+        const res = await fetch(`${API_BASE}/api/geo/threats`);
         const data = await res.json();
         setGeoData(data.sources);
         setLoading(false);

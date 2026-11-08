@@ -72,3 +72,4 @@ Thumbs.db
 CODE
 
 .vercel
+.pytest_cache/

@@ -2,11 +2,11 @@
 echo ========================================================
 echo Installing Python dependencies...
 echo ========================================================
-pip install flask flask-cors pandas
+pip install -r requirements.txt
 
 echo.
 echo ========================================================
-echo Initializing fake threat database...
+echo Initializing persistent threat database...
 echo ========================================================
 python init_db.py
 
@@ -21,7 +21,6 @@ echo ========================================================
 echo Installing Node.js dependencies for frontend...
 echo ========================================================
 cd frontend
-call npm install react-router-dom react-countup --save
 call npm install
 
 echo.
